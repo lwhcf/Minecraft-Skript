@@ -5,7 +5,7 @@
 Options:
   scoreboard: &f&l[ &6&lScoreboard &f&l]&r
 
-Command /Customscoreboard [<string>] [<number>] [<text>]:
+Command /Customscoreboard [<string>] [<string>] [<string>]:
   permission: Customscoreboard.use
   aliases: 스코어보드
   trigger:
@@ -63,7 +63,7 @@ Command /Customscoreboard [<string>] [<number>] [<text>]:
     else if arg-1 is "활성화" or "true" or "enable":
       set {scoreboard.enable} to true
       send "{@scoreboard} &a활성화" to player
-      
+
     # /Customscoreboard 비활성화
     else if arg-1 is "비활성화" or "false" or "disable":
       clear {scoreboard.enable}
@@ -78,6 +78,28 @@ Command /Customscoreboard [<string>] [<number>] [<text>]:
       send "&7/Customscoreboard 삭제 [줄] :: 해당하는 줄을 삭제합니다" to player
       send "&c* 마이너스(-) 줄까지 가능하며 수가 클수록 위 칸에 표시됩니다." to player
       send "&c* 색깔코드(&) 사용이 가능합니다."
+      send "&3* 자신의 닉네임: <player>, 돈: <money>, 현재 시간: <now>, 동접: <users>"
       send "&7/Customscoreboard [활성화/비활성화] :: 스코어보드를 활성화/비활성화 합니다." to player
       send "&f" to player
       stop
+
+
+# 스코어보드 설정
+every 1 second:
+  if {scoreboard.enable} is true:
+    loop all players:
+      wipe loop-player's sidebar
+      set name of sidebar of loop-player to "%{scoreboard.title}%"
+      loop {scoreboard::*}:
+        set {_index} to loop-index
+        set {_index} to {_index} parsed as number
+
+        set {_value} to loop-value-2
+        if {_value} contains "<player>" or "<money>" or "<now>" or "<users>":
+          replace all "<player>" with "%loop-player%" in {_value}
+          replace all "<money>" with "%loop-player's money%" in {_value}
+          replace all "<now>" with "%now%" in {_value}
+          replace all "<users>" with "%size of all players%" in {_value}
+
+        set score "%{_value}%" in sidebar of loop-player to {_index}
+

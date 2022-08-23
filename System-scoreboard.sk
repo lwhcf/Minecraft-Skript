@@ -89,6 +89,13 @@ every 1 second:
   if {scoreboard.enable} is true:
     loop all players:
       wipe loop-player's sidebar
+
+      if {scoreboard.title} contains "<player>" or "<money>" or "<now>" or "<users>":
+        replace all "<player>" with "%loop-player%" in {scoreboard.title}
+        replace all "<money>" with "%loop-player's money%" in {scoreboard.title}
+        replace all "<now>" with "%now%" in {scoreboard.title}
+        replace all "<users>" with "%size of all players%" in {scoreboard.title}
+
       set name of sidebar of loop-player to "%{scoreboard.title}%"
       loop {scoreboard::*}:
         set {_index} to loop-index

@@ -2,15 +2,82 @@
 # Made By.lwhcf
 # Github :: https://github.com/lwhcf/Minecraft-Skript
 
-Command /scoreboard <string> <number> <text>:
-  permission: scoreboard.use
+Options:
+  scoreboard: &f&l[ &6&lScoreboard &f&l]&r
+
+Command /Customscoreboard [<string>] [<number>] [<text>]:
+  permission: Customscoreboard.use
   aliases: 스코어보드
   trigger:
-    if arg-1 is not set:
-      send "&f&l        [ &6&lCustom Scoreboard &f&l]&r"
-      send "&7/scoreboard [제목] :: 스코어보드 제목을 설정합니다." to player
-      send "&7/scoreboard [설정] [줄] [내용] :: 스코어보드를 설정합니다." to player
-      send "&c*마이너스(-) 줄까지 가능하며 수가 클수록 위 칸에 표시됩니다." to player
-      send "&7/scoreboard [삭제] [줄] :: 해당하는 줄을 삭제합니다" to player
-      send "&7/scoreboard "
+
+    # /Customscoreboard 제목
+    if arg-1 is "제목":
+
+      # 내용이 있을 시
+      if arg-2 is set:
+        set {scoreboard.title} to arg-2
+        send "{@scoreboard} 제목설정 &7:: &e%{scoreboard.title}%" to player
+        stop
+
+      # 내용이 없을 시
+      else:
+        send "{@scoreboard} 제목을 입력해주세요."
+        stop
+
+    # /Customscoreboard 설정
+    else if arg-1 is "설정":
+      if arg-2 is set:
+
+        # 모두 true일 경우
+        if arg-3 is set:
+          set {scoreboard::%arg-2%} to arg-3
+          send "{@scoreboard} &e%arg-2%&r줄 설정 &7:: &e%{scoreboard::%arg-2%}%" to player
+          stop
+        
+        # 내용이 없을 시
+        else:
+          send "{@scoreboard} 내용을 입력해주세요." to player
+          stop
+
+      # 줄을 입력하지 않았을 시
+      else:
+        send "{@scoreboard} 줄을 입력해주세요." to player
+        stop
+
+    # /Customscoreboard 삭제    
+    else if arg-1 is "삭제":
+      if arg-2 is set:
+
+        # 해당 줄에 내용이 존재할 시
+        if {scoreboard::%arg-2%} is set:
+          clear {scoreboard::%arg-2%}
+          send "{@scoreboard} &e%arg-2%&r줄 삭제" to player
+          stop
+        
+        # 해당 줄에 내용이 존재하지 않을 시
+        else:
+          send "{@scoreboard} &e%arg-2%&r줄이 존재하지 않습니다." to player
+          stop
+    
+    # /Customscoreboard 활성화
+    else if arg-1 is "활성화" or "true" or "enable":
+      set {scoreboard.enable} to true
+      send "{@scoreboard} &a활성화" to player
       
+    # /Customscoreboard 비활성화
+    else if arg-1 is "비활성화" or "false" or "disable":
+      clear {scoreboard.enable}
+      send "{@scoreboard} &c비활성화" to player
+
+    # 명령어 사용설명  
+    else:
+      send "&f" to player
+      send "&f&l        [ &6&lCustom Scoreboard &f&l]&r"
+      send "&7/Customscoreboard 제목 [제목] :: 스코어보드 제목을 설정합니다." to player
+      send "&7/Customscoreboard 설정 [줄] [내용] :: 스코어보드를 설정합니다." to player
+      send "&7/Customscoreboard 삭제 [줄] :: 해당하는 줄을 삭제합니다" to player
+      send "&c* 마이너스(-) 줄까지 가능하며 수가 클수록 위 칸에 표시됩니다." to player
+      send "&c* 색깔코드(&) 사용이 가능합니다."
+      send "&7/Customscoreboard [활성화/비활성화] :: 스코어보드를 활성화/비활성화 합니다." to player
+      send "&f" to player
+      stop

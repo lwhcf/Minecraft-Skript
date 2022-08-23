@@ -1,5 +1,16 @@
 # Custom Scoreboard System
 # Made By.lwhcf
+# Github :: https://github.com/lwhcf/Minecraft-Skript
 
-Options:
-  scoreboard: 
+Command /scoreboard <string> <number> <text>:
+  permission: scoreboard.use
+  aliases: 스코어보드
+  trigger:
+    if arg-1 is not set:
+      send "&f&l        [ &6&lCustom Scoreboard &f&l]&r"
+      send "&7/scoreboard [제목] :: 스코어보드 제목을 설정합니다." to player
+      send "&7/scoreboard [설정] [줄] [내용] :: 스코어보드를 설정합니다." to player
+      send "&c*마이너스(-) 줄까지 가능하며 수가 클수록 위 칸에 표시됩니다." to player
+      send "&7/scoreboard [삭제] [줄] :: 해당하는 줄을 삭제합니다" to player
+      send "&7/scoreboard "
+      

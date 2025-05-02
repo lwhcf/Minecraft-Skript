@@ -7,7 +7,7 @@ Options:
 
 Command /Customscoreboard [<string>] [<string>] [<string>]:
   permission: Customscoreboard.use
-  aliases: 스코어보드
+  aliases: Customboard
   trigger:
 
     # /Customscoreboard 제목

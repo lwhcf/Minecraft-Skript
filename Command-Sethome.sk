@@ -1,0 +1,31 @@
+# Sethome & Home Commands
+# Skript 2.11.1
+# User_Setting Skript 완벽호환
+
+# Made By.lwhcf
+# Github :: https://github.com/lwhcf/Minecraft-Skript
+
+Options:
+    e_sethome: &f[ &6SETHOME &f]&r
+    e_home: &f[ &6HOME &f]&r
+    e_home_teleport: &f[ &6HOME TELEPORTING.. &f]&r
+
+    k_sethome: &f[ &6집설정 &f]&r
+    k_home: &f[ &6집 &f]&r
+    k_home_teleport: &f[ &6집 이동중.. &f]&r
+
+# Sethome Command Line
+Command /Sethome:
+    aliases: 셋홈, 집설정, 홈설정, HomeSet
+    trigger:
+        set {%uuid of player%.home::x} to x-coordinate of player
+        set {%uuid of player%.home::y} to y-coordinate of player
+        set {%uuid of player%.home::z} to z-coordinate of player
+
+        # User_Setting Skirpt 언어설정관련
+        if {%uuid of player%.Setting::lang} is "Kor":
+            send title "{@k_sethome}" with subtitle "&7X: %{%uuid of player%.home::x}% Y: %{%uuid of player%.home::y}% Z: %{%uuid of player%.home::z}%"
+            stop
+        else if {%uuid of player%.Setting::lang} is not set:
+            send title "{@e_sethome}" with subtitle "&7X: %{%uuid of player%.home::x}% Y: %{%uuid of player%.home::y}% Z: %{%uuid of player%.home::z}%"
+            stop

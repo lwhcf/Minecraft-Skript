@@ -1,6 +1,10 @@
 # Sethome & Home Commands
 # Skript 2.11.1
+# Addon :: None
 # Minecraft 1.20.1
+
+# Var
+# {home_location::%uuid of player%} :: 집좌표
 
 # Made By.lwhcf
 # Github :: https://github.com/lwhcf/Minecraft-Skript
@@ -9,42 +13,107 @@ Options:
     sethome: &f[ &6집설정 &f]&r
     home: &f[ &6집 &f]&r
     home_teleport: &f[ &6집 이동중.. &f]&r
+    console_home: &f[ &c! &f]&r
 
 # Sethome Command Line
-Command /Sethome:
-    aliases: 셋홈, 집설정, 홈설정, HomeSet
+Command /sethome:
+    aliases: 셋홈, 집설정, 홈설정, homeset
     trigger:
         # 좌표 초기화
-        clear {home.%uuid of player%::*}
-        clear {home_location.%uuid of player%} 
+        clear {home_location::%uuid of player%} 
 
         # 좌표 설정
-        set {home.%uuid of player%::x} to x-coordinate of player
-        set {home.%uuid of player%::y} to y-coordinate of player
-        set {home.%uuid of player%::z} to z-coordinate of player
-        set {home_location.%uuid of player%} to location {home.%uuid of player%::x}, {home.%uuid of player%::y}, {home.%uuid of player%::z}
+        set {_home.%uuid of player%::x} to x-coordinate of player
+        set {_home.%uuid of player%::y} to y-coordinate of player
+        set {_home.%uuid of player%::z} to z-coordinate of player
+        set {home_location::%uuid of player%} to location {_home.%uuid of player%::x}, {_home.%uuid of player%::y}, {_home.%uuid of player%::z}
 
         # 집 설정완료 알림메시지
-        send title "{@sethome}" with subtitle "&7X: %{home.%uuid of player%::x}% Y: %{home.%uuid of player%::y}% Z: %{home.%uuid of player%::z}%"
+        send title "{@sethome}" with subtitle "&7X: %{_home.%uuid of player%::x}%, Y: %{_home.%uuid of player%::y}%, Z: %{_home.%uuid of player%::z}%"
         stop
 
 # Home Command Line
 Command /home:
-    aliases: 홈, 집, 집이동, home_teleport
+    aliases: 홈, 집, 집이동, hometp, hometeleport, teleporthome, tphome
     trigger:
         # 집 존재여부 확인
-        if {home_location.%uuid of player%} is set:
+        if {home_location::%uuid of player%} is set:
             send title "{@home}" with subtitle "&7잠시후 이동합니다.." for 1 second
             wait 15 ticks
+
+            # 이동 시작좌표 저장
+            set {_homeloc.%uuid of player%::x} to x-coordinate of player
+            set {_homeloc.%uuid of player%::y} to y-coordinate of player
+            set {_homeloc.%uuid of player%::z} to z-coordinate of player
 
             # 집 이동 쿨타임
             set {_hometeleport.timeloop.%uuid of player%} to 3
             loop 3 times:
                 send title "{@home_teleport}" with subtitle "&7%{_hometeleport.timeloop.%player%}%..." for 1 second
-                subtract 1 from {_hometeleport.timeloop.%uuid of player%}
-                wait 1 second
-            
+                # 워프중 이동감지
+                if player's x-coordinate is {_homeloc.%uuid of player%::x}:
+                    if player's y-coordinate is {_homeloc.%uuid of player%::y}:
+                        if player's z-coordinate is {_homeloc.%uuid of player%::z}:
+                            subtract 1 from {_hometeleport.timeloop.%uuid of player%}
+                            wait 1 second
+                        else:
+                            send title "{@home}" with subtitle "&7이동이 취소되었습니다." for 0.2 second
+                            stop
+                    else:
+                        send title "{@home}" with subtitle "&7이동이 취소되었습니다." for 0.2 second
+                        stop
+                else:
+                    send title "{@home}" with subtitle "&7이동이 취소되었습니다." for 0.2 second
+                    stop
+
             # 집 텔레포트 구문
-            teleport player to location at {home_location.%uuid of player%}
+            teleport player to location at {home_location::%uuid of player%}
             send title "{@home}" with subtitle "&7이동하였습니다" for 0.2 second
-            
+            stop
+        
+        # 집 없음 알림
+        else:
+            send title "{@home}" with subtitle "&7집이 존재하지 않습니다" for 0.2 second
+            stop
+
+# DelHome Command Line
+Command /delhome:
+    aliases: 집삭제, 집제거, 집초기화, 집지우기, 홈삭제, 홈제거, 홈초기화, 홈지우기, delsethome, delhomeset, removehome, removesethome, removehomeset
+    trigger:
+        # 집 존재여부 확인
+        if {home_location::%uuid of player%} is set:
+            clear {home_location::%uuid of player%}
+            send title "{@home}" with subtitle "&7삭제하였습니다"
+            stop
+
+# GM Command Line
+Command /CONSOLE_HOME [<string>] [<offlineplayer>]:
+    permission: console_home.use
+    trigger:
+        # CLEAR
+        if arg-1 is "clear":
+            if arg-2 is set:
+                if {home_location::%uuid of arg-2%} is set:
+                    clear {home_location::%uuid of arg-2%}
+                    send "{@console_home} %arg-2% &7Home Clear&r" 
+                    stop
+                else if {home_location::%uuid of arg-2%} is not set:
+                    send "{@console_home} %arg-2% &7Not Set Home&r"
+                    stop
+            else:
+                send "{@console_home} &7/CONSOLE_HOME [CLEAR] [PLAYER]"
+                stop
+
+        # CLEAR ALL
+        else if arg-1 is "clearall":
+            clear {home_location::*}
+            send "{@console_home} &7Home All Clear&r" 
+            stop
+
+        # NOT argument
+        else:
+            send ""
+            send "{@console_home} /CONSOLE_HOME [CLEAR] [PLAYER] &7: 홈좌표 초기화"
+            send "{@console_home} /CONSOLE_HOME [CLEARALL] &7: 홈좌표 전체초기화"
+            send ""
+            stop

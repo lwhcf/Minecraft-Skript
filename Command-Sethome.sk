@@ -17,6 +17,7 @@ Command /Sethome:
         # 좌표 초기화
         clear {home.%uuid of player%::*}
         clear {home_location.%uuid of player%} 
+
         # 좌표 설정
         set {home.%uuid of player%::x} to x-coordinate of player
         set {home.%uuid of player%::y} to y-coordinate of player
@@ -33,16 +34,17 @@ Command /home:
     trigger:
         # 집 존재여부 확인
         if {home_location.%uuid of player%} is set:
-            send title "{@home}" with subtitle "&7이동합니다.." for 1 second
+            send title "{@home}" with subtitle "&7잠시후 이동합니다.." for 1 second
+            wait 15 ticks
 
+            # 집 이동 쿨타임
             set {_hometeleport.timeloop.%uuid of player%} to 3
-            # 집 이동 쿨타임 시작
             loop 3 times:
                 send title "{@home_teleport}" with subtitle "&7%{_hometeleport.timeloop.%player%}%..." for 1 second
                 subtract 1 from {_hometeleport.timeloop.%uuid of player%}
                 wait 1 second
             
             # 집 텔레포트 구문
-            teleport player to location at {_home.location.%uuid of player%}
-            send title "{@home}" with subtitle "&7이동하였습니다" for 1 second
+            teleport player to location at {home_location.%uuid of player%}
+            send title "{@home}" with subtitle "&7이동하였습니다" for 0.2 second
             

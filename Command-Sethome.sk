@@ -1,32 +1,48 @@
 # Sethome & Home Commands
 # Skript 2.11.1
 # Minecraft 1.20.1
-# User_Setting Skript 완벽호환
 
 # Made By.lwhcf
 # Github :: https://github.com/lwhcf/Minecraft-Skript
 
 Options:
-    e_sethome: &f[ &6SETHOME &f]&r
-    e_home: &f[ &6HOME &f]&r
-    e_home_teleport: &f[ &6HOME TELEPORTING.. &f]&r
-
-    k_sethome: &f[ &6집설정 &f]&r
-    k_home: &f[ &6집 &f]&r
-    k_home_teleport: &f[ &6집 이동중.. &f]&r
+    sethome: &f[ &6집설정 &f]&r
+    home: &f[ &6집 &f]&r
+    home_teleport: &f[ &6집 이동중.. &f]&r
 
 # Sethome Command Line
 Command /Sethome:
     aliases: 셋홈, 집설정, 홈설정, HomeSet
     trigger:
-        set {%uuid of player%.home::x} to x-coordinate of player
-        set {%uuid of player%.home::y} to y-coordinate of player
-        set {%uuid of player%.home::z} to z-coordinate of player
+        # 좌표 초기화
+        clear {home.%uuid of player%::*}
+        clear {home_location.%uuid of player%} 
+        # 좌표 설정
+        set {home.%uuid of player%::x} to x-coordinate of player
+        set {home.%uuid of player%::y} to y-coordinate of player
+        set {home.%uuid of player%::z} to z-coordinate of player
+        set {home_location.%uuid of player%} to location {home.%uuid of player%::x}, {home.%uuid of player%::y}, {home.%uuid of player%::z}
 
-        # User_Setting Skirpt 언어설정관련
-        if {%uuid of player%.Setting::lang} is "Kor":
-            send title "{@k_sethome}" with subtitle "&7X: %{%uuid of player%.home::x}% Y: %{%uuid of player%.home::y}% Z: %{%uuid of player%.home::z}%"
-            stop
-        else if {%uuid of player%.Setting::lang} is not set:
-            send title "{@e_sethome}" with subtitle "&7X: %{%uuid of player%.home::x}% Y: %{%uuid of player%.home::y}% Z: %{%uuid of player%.home::z}%"
-            stop
+        # 집 설정완료 알림메시지
+        send title "{@sethome}" with subtitle "&7X: %{home.%uuid of player%::x}% Y: %{home.%uuid of player%::y}% Z: %{home.%uuid of player%::z}%"
+        stop
+
+# Home Command Line
+Command /home:
+    aliases: 홈, 집, 집이동, home_teleport
+    trigger:
+        # 집 존재여부 확인
+        if {home_location.%uuid of player%} is set:
+            send title "{@home}" with subtitle "&7이동합니다.." for 1 second
+
+            set {_hometeleport.timeloop.%uuid of player%} to 3
+            # 집 이동 쿨타임 시작
+            loop 3 times:
+                send title "{@home_teleport}" with subtitle "&7%{_hometeleport.timeloop.%player%}%..." for 1 second
+                subtract 1 from {_hometeleport.timeloop.%uuid of player%}
+                wait 1 second
+            
+            # 집 텔레포트 구문
+            teleport player to location at {_home.location.%uuid of player%}
+            send title "{@home}" with subtitle "&7이동하였습니다" for 1 second
+            

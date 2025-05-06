@@ -15,7 +15,7 @@ Options:
     home_teleport: &f[ &6집 이동중.. &f]&r
     console_home: &f[ &c! &f]&r
 
-    # 명령어 쿨타임 ( Deafult : 5 second )
+    # 명령어 쿨타임 ( Default : 5 second )
     home_cooldown: 5 second
     # 쿨타임 메시지
     home_cooldown.message: &f[ &6! &f]&r 잠시후 다시 시도해주세요!

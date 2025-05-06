@@ -1,0 +1,39 @@
+# UserSetting System
+# Skript 2.11.1
+# Minecraft 1.20.1
+
+# Var
+# User_Setting_Gui(player, gui_rows, gui_name) :: GUI생성 ( 함수 )
+
+# Made By.lwhcf
+# Github :: https://github.com/lwhcf/Minecraft-Skript
+
+Options:
+    User_Setting: &f[ &6! &f]&r
+    User_Setting.Gui: &f[ &e개인설정 &f]&r
+
+    # 개인설정 전용도구 ( Default : Clock )
+    User_Setting.item: Clock
+    # GUI 사이드바 아이템 ( Default : Gary_Stained_Glass_Pane)
+    User_Setting.SideItem: Gary_Stained_Glass_Pane ### 해당부분부터 추가제작 필요 ###
+
+# GUI Function Line
+function User_Setting_Gui(p: player, rows: number, name: text):
+    open chest with {_rows} row named "%{_name}%" to {_p}
+
+# UserSetting Tool Command Line
+On right click:
+    if player's tool is {@User_Setting.item}:
+        execute player command "/UserSetting"
+
+# UserSetting Command Line
+Command /UserSetting:
+    aliases: 개인설정, 개인세팅, 유저설정, 유저세팅
+    trigger:
+        User_Setting_Gui(player, 5, "{@User_Setting.Gui}")
+
+
+# GUI 아이템 이동방지
+On inventory click:
+    if name of event-inventory is "{@User_Setting.Gui}":
+        cancel event

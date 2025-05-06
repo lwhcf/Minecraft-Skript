@@ -1,10 +1,10 @@
 # Sethome & Home Commands
 # Skript 2.11.1
-# Addon :: None
 # Minecraft 1.20.1
 
 # Var
 # {home_location::%uuid of player%} :: 집좌표
+# home_warpCancel(player) :: 워프취소 ( 함수 )
 
 # Made By.lwhcf
 # Github :: https://github.com/lwhcf/Minecraft-Skript
@@ -15,9 +15,21 @@ Options:
     home_teleport: &f[ &6집 이동중.. &f]&r
     console_home: &f[ &c! &f]&r
 
+    # 명령어 쿨타임 ( Deafult : 5 second )
+    home_cooldown: 5 second
+    # 쿨타임 메시지
+    home_cooldown.message: &f[ &6! &f]&r 잠시후 다시 시도해주세요!
+
+# Function Line
+function home_warpCancel(p: player):
+    send title "{@home}" with subtitle "&7이동이 취소되었습니다." to {_p} for 0.2 second
+    play sound "entity.dragon_fireball.explode" with pitch 2 at {_p}
+
 # Sethome Command Line
 Command /sethome:
     aliases: 셋홈, 집설정, 홈설정, homeset
+    cooldown: {@home_cooldown}
+    cooldown message: {@home_cooldown.message}
     trigger:
         # 좌표 초기화
         clear {home_location::%uuid of player%} 
@@ -28,17 +40,21 @@ Command /sethome:
         set {_home.%uuid of player%::z} to z-coordinate of player
         set {home_location::%uuid of player%} to location {_home.%uuid of player%::x}, {_home.%uuid of player%::y}, {_home.%uuid of player%::z}
 
-        # 집 설정완료 알림메시지
+        # 집 설정완료 알림
         send title "{@sethome}" with subtitle "&7X: %{_home.%uuid of player%::x}%, Y: %{_home.%uuid of player%::y}%, Z: %{_home.%uuid of player%::z}%"
+        play sound "entity.player.levelup" with pitch 2 at player
         stop
 
 # Home Command Line
 Command /home:
     aliases: 홈, 집, 집이동, hometp, hometeleport, teleporthome, tphome
+    cooldown: {@home_cooldown}
+    cooldown message: {@home_cooldown.message}
     trigger:
         # 집 존재여부 확인
         if {home_location::%uuid of player%} is set:
             send title "{@home}" with subtitle "&7잠시후 이동합니다.." for 1 second
+            play sound "entity.experience_bottle.throw" to player
             wait 15 ticks
 
             # 이동 시작좌표 저장
@@ -49,26 +65,28 @@ Command /home:
             # 집 이동 쿨타임
             set {_hometeleport.timeloop.%uuid of player%} to 3
             loop 3 times:
-                send title "{@home_teleport}" with subtitle "&7%{_hometeleport.timeloop.%player%}%..." for 1 second
                 # 워프중 이동감지
                 if player's x-coordinate is {_homeloc.%uuid of player%::x}:
                     if player's y-coordinate is {_homeloc.%uuid of player%::y}:
                         if player's z-coordinate is {_homeloc.%uuid of player%::z}:
+                            send title "{@home_teleport}" with subtitle "&7%{_hometeleport.timeloop.%player%}%..." for 1 second
+                            play sound "entity.experience_orb.pickup" to player
                             subtract 1 from {_hometeleport.timeloop.%uuid of player%}
                             wait 1 second
                         else:
-                            send title "{@home}" with subtitle "&7이동이 취소되었습니다." for 0.2 second
+                            home_warpCancel(player)
                             stop
                     else:
-                        send title "{@home}" with subtitle "&7이동이 취소되었습니다." for 0.2 second
+                        home_warpCancel(player)
                         stop
                 else:
-                    send title "{@home}" with subtitle "&7이동이 취소되었습니다." for 0.2 second
+                    home_warpCancel(player)
                     stop
 
             # 집 텔레포트 구문
             teleport player to location at {home_location::%uuid of player%}
             send title "{@home}" with subtitle "&7이동하였습니다" for 0.2 second
+            play sound "entity.enderman.teleport" to player
             stop
         
         # 집 없음 알림
@@ -84,6 +102,7 @@ Command /delhome:
         if {home_location::%uuid of player%} is set:
             clear {home_location::%uuid of player%}
             send title "{@home}" with subtitle "&7삭제하였습니다"
+            play sound "entity.player.levelup" with pitch 2 at player
             stop
 
 # GM Command Line
